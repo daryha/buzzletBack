@@ -56,26 +56,14 @@ export class UserService {
     return user;
   }
 
-  async uploadAvatar(userid: string, file: Express.Multer.File, req: Request) {
-    if (!file) throw new HttpException('No file', HttpStatus.BAD_REQUEST);
-    const url = `${req.protocol}://${req.get('host')}/avatars/${file.filename}`;
-
-    const user = await this.updateAvatar(userid, file.filename);
-
-    return {
-      id: user.id,
-      email: user.email,
-      avatarUrl: url,
-    };
-  }
-
-  async updateAvatar(userId: string, filename: string) {
+  async updateAvatar(userId: string, avatarUrl: string) {
     const exists = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!exists) throw new NotFoundException('User not found');
+    console.log(avatarUrl);
 
     return this.prisma.user.update({
       where: { id: userId },
-      data: { avatar: filename },
+      data: { avatar: avatarUrl },
     });
   }
 }

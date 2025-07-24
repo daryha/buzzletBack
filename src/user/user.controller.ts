@@ -67,7 +67,7 @@ export class UserController {
         }
         cb(null, true);
       },
-      limits: { fileSize: 2 * 1024 * 1024 }, // до 2 МБ
+      limits: { fileSize: 2 * 1024 * 1024 },
     }),
   )
   async uploadAvatar(
@@ -78,10 +78,9 @@ export class UserController {
     if (!file) {
       throw new HttpException('No file provided', HttpStatus.BAD_REQUEST);
     }
-
-    const user = await this.userService.updateAvatar(userId, file.filename);
-
     const avatarUrl = `${req.protocol}://${req.get('host')}/avatars/${file.filename}`;
+
+    const user = await this.userService.updateAvatar(userId, avatarUrl);
 
     return {
       id: user.id,

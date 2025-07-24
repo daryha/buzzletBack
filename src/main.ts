@@ -19,10 +19,16 @@ async function bootstrap() {
   );
 
   const uploadPath = join(process.cwd(), 'uploads');
-  console.log('>> STATIC DIR:', uploadPath);
 
   app.useStaticAssets(uploadPath, {
     prefix: '/avatars',
+  });
+
+  app.enableCors({
+    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
   });
 
   const config = new DocumentBuilder()

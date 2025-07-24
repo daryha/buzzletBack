@@ -82,6 +82,7 @@ export class AuthService {
     return { message: 'success logout' };
   }
 
+
   async validate(id: string) {
     const user = await this.prisma.user.findUnique({ where: { id } });
 
