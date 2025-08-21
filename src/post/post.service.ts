@@ -13,7 +13,7 @@ import { Post } from '@prisma/client';
 export class PostService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findAll() {
+  async findAll(userId?: string) {
     const posts = this.prisma.post.findMany({
       where: {
         published: true,
@@ -32,6 +32,7 @@ export class PostService {
         },
         author: {
           select: {
+            id: true,
             name: true,
             avatar: true,
           },
@@ -43,16 +44,31 @@ export class PostService {
             views: true,
           },
         },
+        likes: userId
+          ? {
+              where: { userId },
+              take: 1,
+              select: { id: true },
+            }
+          : false,
       },
       orderBy: {
         createdAt: 'desc',
       },
     });
 
-    return await posts;
+    const result = await posts;
+
+    return result.map((post) => {
+      const { likes, ...postWithoutLikes } = post;
+      return {
+        ...postWithoutLikes,
+        liked: likes?.length > 0,
+      };
+    });
   }
 
-  async findById(id: string) {
+  async findById(id: string, userId?: string) {
     const post = await this.prisma.post.findUnique({
       where: { id },
       select: {
@@ -64,7 +80,12 @@ export class PostService {
         published: true,
         createdAt: true,
         updatedAt: true,
-        tags: true,
+        tags: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
         comments: {
           select: {
             id: true,
@@ -88,8 +109,16 @@ export class PostService {
           select: {
             id: true,
             name: true,
+            avatar: true,
           },
         },
+        likes: userId
+          ? {
+              where: { userId },
+              take: 1,
+              select: { id: true },
+            }
+          : false,
       },
     });
 
@@ -101,9 +130,11 @@ export class PostService {
       throw new NotFoundException(`Пост с id = ${id} не найден`);
     }
 
+    const { likes, ...postWithoutLikes } = post;
     return {
+      ...postWithoutLikes,
       ...post,
-      tags: post.tags.map((tag) => tag.name),
+      liked: likes?.length > 0,
     };
   }
 
@@ -214,7 +245,6 @@ export class PostService {
           },
         },
       });
-
       return { liked: false };
     }
 

@@ -19,20 +19,21 @@ import { Authorization } from 'src/auth/decorators/auth.decorator';
 import { UserId } from 'src/auth/decorators/user-id.decorator';
 import { ParseTagsPipe } from 'common/pipes/transform-tag.pipe';
 import { Request } from 'express';
+import { OptionalUserId } from 'src/auth/decorators/optional-user-id.decorator';
 
 @Controller('post')
 export class PostController {
   constructor(private readonly postService: PostService) {}
   @Get()
   @ApiOperation({ summary: 'Получить все посты' })
-  findAll() {
-    return this.postService.findAll();
+  findAll(@OptionalUserId() userId?: string) {
+    return this.postService.findAll(userId);
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Получить пост по id' })
-  findById(@Param('id') id: string) {
-    return this.postService.findById(id);
+  findById(@Param('id') id: string, @OptionalUserId() userId?: string) {
+    return this.postService.findById(id, userId);
   }
 
   @Post()
@@ -99,3 +100,4 @@ export class PostController {
     return this.postService.addView(postId, ip, userId);
   }
 }
+1;

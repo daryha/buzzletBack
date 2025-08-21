@@ -13,7 +13,6 @@ import { AuthService } from './auth.service';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
 import { Request, Response } from 'express';
-import { AuthGuard } from '@nestjs/passport';
 import { Authorization } from './decorators/auth.decorator';
 
 @Controller('auth')
